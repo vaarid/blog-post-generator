@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware  # 👈 добавили
+from fastapi.responses import JSONResponse
 
 # === 1. Загружаем ключи из .env ===
 load_dotenv()
@@ -52,7 +53,11 @@ def generate_post(topic: str):
 # === 6. Эндпоинты ===
 @app.post("/generate-post")
 async def generate_post_api(data: Topic):
-    return generate_post(data.topic)
+    post = generate_post(data.topic)
+    return JSONResponse(
+        content={"topic": data.topic, "post": post},
+        ensure_ascii=False  # 🔥 выключаем экранирование русских символов
+    )
 
 @app.get("/")
 async def root():
